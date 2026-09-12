@@ -16,8 +16,6 @@ import swaggerUi from 'swagger-ui-express';   // Middleware to serve Swagger UI 
 import swaggerSpec from './swaggerConfig.js'; // Imports generated Swagger specification object (contains API metadata and route definitions)
                                               // used by Swagger UI to present data to user
 
-//import csrf from 'csurf';      // middleware import for CSRF (Cross-Site Request Forgery) protection
-//import redis from 'redis';     // Used to cache 'products' data in order to reduce load and requests to database. 
 
 // ===================================================================================================
 // Routes Imports
@@ -50,25 +48,10 @@ dotenv.config();
 // Create Express App
 // ===================================================================================================
 
-const app = express();                // Initialize Express application
-const port = 5000;                    // define back-end port
+const app  = express();                  // Initialize Express application
+const port = process.env.PORT || 5000;   // define back-end port
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec)); // Swagger UI setup (must come after 'app' is defined)
-
-// ===================================================================================================
-// Redis for application caching for faster performance and scaling (will revisit later)
-// ===================================================================================================
-
-// // Set up Redis client
-// const redisClient = redis.createClient({
-//   host: 'locahost', // ensures that Redis runs locally (or change server configuration when needed)
-//   port: '6379'      // default port for Redis
-// });
-
-// // Set up Redis connection
-// redisClient.connect()
-//   .then(() => console.log('Redis connected'))
-//   .catch(error => console.log('Redis connection error: ', error));
 
 
 // ==============================================================================
@@ -97,12 +80,6 @@ app.use(session({           // Session setup (used by Google OAuth during login 
 
 app.use(passport.initialize());  // Initialize Passport middleware
 app.use(passport.session());     // Allow persistent login sessions (required for Google OAuth login)
-
-// ==============================================================================
-// CSRF Protection (Optional but Recommended — may add/update later)
-// ==============================================================================
-//const csrfProtection = csrf({ cookie: true }); // Enable/Disable if CSRF is needed
-//app.use(csrfProtection);
 
 
 
@@ -138,13 +115,6 @@ app.use('/', checkoutRoutes);
 
 app.use('/', ordersRoutes);
 
-// Default route for any other requests (Optional, for catch-all error handling)
-//app.use('*', (req, res) => {
-//  res.status(404).json({ error: 'Route not found' });
-//});
-
-// Export the redisClient so it can be reused in other parts of the app
-//export { redisClient };
 
 
 // ==============================================================================
